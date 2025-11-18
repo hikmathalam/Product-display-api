@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Product Catalog</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h1 { margin-bottom: 12px; }
+    button { padding: 8px 12px; margin-right:8px; cursor:pointer; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { padding: 8px; border: 1px solid #ddd; text-align:left; }
+    .in { color: #0a7; font-weight: 600; }
+    .out { color: #b00; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Product Catalog</h1>
+
+  <div>
+    <button id="loadAll">Load All Products</button>
+    <button id="loadInStock">Load In-Stock</button>
+    <button id="loadCategories">Show Categories</button>
+  </div>
+
+  <div id="output"></div>
+
+  <script>
+    const output = document.getElementById('output');
+
+    // Renders product array into a table
+    function renderProducts(products) {
+      if (!Array.isArray(products) || products.length === 0) {
+        output.innerHTML = '<p>No products to show.</p>';
+        return;
+      }
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      thead.innerHTML = '<tr><th>Name</th><th>Category</th><th>Price (₹)</th><th>Stock</th></tr>';
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+      products.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${p.name}</td>
+                        <td>${p.category}</td>
+                        <td>${Number(p.price)}</td>
+                        <td class="${p.inStock ? 'in':'out'}">${p.inStock ? 'In stock' : 'Out of stock'}</td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      output.innerHTML = '';
+      output.appendChild(table);
+    }
+
+    // Fetch helper
+    async function fetchAndRender(path, renderer = renderProducts) {
+      output.innerHTML = '<p>Loading...</p>';
+      try {
+        const res = await fetch(path);
+        if (!res.ok) throw new Error('Network response was not OK');
+        const data = await res.json();
+        renderer(data);
+      } catch (err) {
+        output.innerHTML = '<p style="color:red">Error: ' + err.message + '</p>';
+      }
+    }
+
+    // Button events
+    document.getElementById('loadAll').addEventListener('click', () => {
+      fetchAndRender('/products');
+    });
+
+    document.getElementById('loadInStock').addEventListener('click', () => {
+      fetchAndRender('/products/instock');
+    });
+
+    document.getElementById('loadCategories').addEventListener('click', async () => {
+      output.innerHTML = '<p>Loading categories...</p>';
+      try {
+        const res = await fetch('/products/categories');
+        if (!res.ok) throw new Error('Network response was not OK');
+        const data = await res.json();
+        output.innerHTML = '<h3>Categories</h3><ul>' + data.categories.map(c => `<li>${c}</li>`).join('') + '</ul>';
+      } catch (err) {
+        output.innerHTML = '<p style="color:red">Error: ' + err.message + '</p>';
+      }
+    });
+
+    // Optional: auto-load on page open
+    // fetchAndRender('/products');
+  </script>
+</body>
+</html>

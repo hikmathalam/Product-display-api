@@ -54,7 +54,7 @@ product-catalog-api/
 
 1. Clone the repo:
 ```bash
-git clone https://github.com/<your-username>/product-catalog-api.git
+git clone https://github.com/hikmathalam/Product-display-api.git
 cd product-catalog-api
 ```
 
@@ -78,7 +78,7 @@ API endpoints:
 
 ## GitHub Repository Link
 Replace with your repository URL:  
-`https://github.com/<your-username>/product-catalog-api`
+`https://github.com/hikmathalam/Product-display-api.git`
 
 ## Author
 Hikmath Alam
